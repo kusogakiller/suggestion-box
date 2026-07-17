@@ -8,11 +8,93 @@
 </head>
 
 <body>
-	<h1>Hello World!</h1>
 
-	<div class="cf-turnstile"
-		data-sitekey="0x4AAAAAAD356TVJG6c5Ipvw">
-	</div>
+<h1>意見箱</h1>
+
+<div>
+	<label>
+		名前:
+		<input id="username" type="text">
+	</label>
+</div>
+
+<br>
+
+<div>
+	<label>
+		タイトル:
+		<input id="title" type="text">
+	</label>
+</div>
+
+<br>
+
+<div>
+	<label>
+		内容:
+		<br>
+		<textarea id="message" rows="8" cols="40"></textarea>
+	</label>
+</div>
+
+<br>
+
+<div class="cf-turnstile"
+	data-sitekey="0x4AAAAAAD356TVJG6c5Ipvw">
+</div>
+
+<br>
+
+<button onclick="send()">送信</button>
+
+<p id="result"></p>
+
+
+<script>
+async function send() {
+	const username = document.getElementById("username").value;
+	const title = document.getElementById("title").value;
+	const message = document.getElementById("message").value;
+
+	const token = document.querySelector(
+		"[name='cf-turnstile-response']"
+	)?.value;
+
+
+	if (!username || !title || !message) {
+		alert("入力してください");
+		return;
+	}
+
+	if (!token) {
+		alert("Turnstile認証してください");
+		return;
+	}
+
+
+	const res = await fetch(
+		"https://green-darkness-a19d.shenfengwushilan.workers.dev/submit",
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				username,
+				title,
+				message,
+				turnstileToken: token
+			})
+		}
+	);
+
+
+	const data = await res.json();
+
+	document.getElementById("result").textContent =
+		JSON.stringify(data);
+}
+</script>
 
 </body>
 </html>
