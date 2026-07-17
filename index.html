@@ -1,180 +1,502 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="ja">
 <head>
-	<meta charset="UTF-8">
-	<title>Suggestion Box</title>
 
-	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<style>
-		.honeypot {
-			position: absolute;
-			left: -9999px;
-			top: -9999px;
-			width: 0;
-			height: 0;
-			overflow: hidden;
-			opacity: 0;
-			pointer-events: none;
-		}
-	</style>
+<title>Suggestion Box</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<style>
+
+:root{
+    --bg:#f6f7f9;
+    --card:#fff;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Inter",sans-serif;
+}
+
+
+.container{
+    max-width:820px;
+    margin:auto;
+    padding:60px 20px;
+}
+
+
+h1{
+    margin:0 0 10px;
+    font-size:40px;
+}
+
+
+.subtitle{
+    color:var(--muted);
+    line-height:1.8;
+    margin-bottom:30px;
+}
+
+
+.section-title{
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin:22px 0 10px;
+}
+
+
+.card{
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:20px;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.04);
+
+}
+
+
+input,
+textarea{
+
+    width:100%;
+
+    padding:10px 12px;
+
+    margin-top:6px;
+
+    font-size:14px;
+
+    border-radius:8px;
+
+    border:1px solid var(--border);
+
+    font-family:inherit;
+
+}
+
+
+textarea{
+
+    resize:vertical;
+
+}
+
+
+button{
+
+    padding:10px 16px;
+
+    font-size:14px;
+
+    border-radius:8px;
+
+    border:1px solid var(--border);
+
+    background:#111827;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.15s;
+
+}
+
+
+button:hover{
+
+    transform:translateY(-1px);
+
+}
+
+
+.status{
+
+    margin-left:12px;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+}
+
+
+.output{
+
+    margin-top:20px;
+
+    padding:14px;
+
+    background:#f9fafb;
+
+    border:1px solid var(--border);
+
+    border-radius:8px;
+
+    font-family:"JetBrains Mono",monospace;
+
+    white-space:pre-wrap;
+
+}
+
+
+small{
+
+    color:var(--muted);
+
+}
+
+
+.honeypot{
+
+    position:absolute;
+
+    left:-9999px;
+
+    top:-9999px;
+
+    width:0;
+
+    height:0;
+
+    overflow:hidden;
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+
+footer{
+
+    margin-top:28px;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+}
+
+
+</style>
+
 </head>
+
 
 <body>
 
-<h1>意見箱</h1>
 
-<div>
-	<label>
-		名前:
-		<input id="username" type="text" maxlength="50">
-	</label>
+<div class="container">
+
+
+<h1>Suggestion Box</h1>
+
+
+<div class="subtitle">
+
+大紅茶帝国の意見箱です。<br>
+
+送信内容はWebhook経由で管理されます。
+
 </div>
+
+
+
+<div class="section-title">
+
+Message
+
+</div>
+
+
+<div class="card">
+
+
+<label>
+
+名前
+
+<input
+id="username"
+type="text"
+maxlength="16"
+placeholder="Username">
+
+</label>
+
 
 <br>
 
-<div>
-	<label>
-		タイトル:
-		<input id="title" type="text" maxlength="100">
-	</label>
-</div>
+
+<label>
+
+タイトル
+
+<input
+id="title"
+type="text"
+maxlength="100"
+placeholder="Title">
+
+</label>
+
 
 <br>
 
-<div>
-	<label>
-		内容:
-		<br>
-		<textarea id="message" rows="8" cols="40" maxlength="3000"></textarea>
-	</label>
+
+<label>
+
+内容
+
+<textarea
+id="message"
+rows="8"
+maxlength="1000"
+placeholder="Message"></textarea>
+
+</label>
+
+
 </div>
+
+
 
 <!-- Honeypot -->
+
 <div class="honeypot">
-	<label>
-		Website:
-		<input
-			id="website"
-			name="website"
-			type="text"
-			autocomplete="off"
-		>
-	</label>
 
-	<label>
-		Email:
-		<input
-			id="email_check"
-			name="email_check"
-			type="email"
-			autocomplete="off"
-		>
-	</label>
+<input id="website">
 
-	<label>
-		Phone:
-		<input
-			id="phone_check"
-			name="phone_check"
-			type="text"
-			autocomplete="off"
-		>
-	</label>
+<input id="email_check">
 
-	<input
-		id="form_time"
-		type="hidden"
-	>
+<input id="phone_check">
+
+<input id="form_time">
+
 </div>
 
-<br>
+
+
+<div class="section-title">
+
+Verification
+
+</div>
+
+
+<div class="card">
+
 
 <div
-	class="cf-turnstile"
-	data-sitekey="0x4AAAAAAD356TVJG6c5Ipvw">
+class="cf-turnstile"
+data-sitekey="0x4AAAAAAD356TVJG6c5Ipvw">
 </div>
+
 
 <br>
 
-<button onclick="send()">送信</button>
 
-<p id="result"></p>
+<button onclick="send()">
+
+Send
+
+</button>
+
+
+<span id="status" class="status">
+
+Ready
+
+</span>
+
+
+</div>
+
+
+
+<div class="section-title">
+
+Result
+
+</div>
+
+
+<div class="output" id="result">
+
+No output yet.
+
+</div>
+
+
+
+<footer>
+
+Secure suggestion system powered by Cloudflare Workers.
+
+</footer>
+
+
+</div>
+
+
 
 <script>
+
+
 const formStart = Date.now();
 
-document.getElementById("form_time").value = formStart;
+document.getElementById("form_time").value=formStart;
 
-async function send() {
 
-	const username =
-		document.getElementById("username").value.trim();
 
-	const title =
-		document.getElementById("title").value.trim();
+async function send(){
 
-	const message =
-		document.getElementById("message").value.trim();
 
-	const website =
-		document.getElementById("website").value;
+const status=document.getElementById("status");
 
-	const email_check =
-		document.getElementById("email_check").value;
+status.textContent="Sending...";
 
-	const phone_check =
-		document.getElementById("phone_check").value;
 
-	const form_time =
-		document.getElementById("form_time").value;
+const username=
+document.getElementById("username").value.trim();
 
-	const token = document.querySelector(
-		"[name='cf-turnstile-response']"
-	)?.value;
 
-	if (!username || !title || !message) {
-		alert("入力してください");
-		return;
-	}
+const title=
+document.getElementById("title").value.trim();
 
-	if (!token) {
-		alert("Turnstileによる認証を行ってください");
-		return;
-	}
 
-	const res = await fetch(
-		"https://green-darkness-a19d.kusogakiller.workers.dev/submit",
-		{
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				username,
-				title,
-				message,
+const message=
+document.getElementById("message").value.trim();
 
-				website,
-				email_check,
-				phone_check,
-				form_time,
 
-				turnstileToken: token
-			})
-		}
-	);
 
-	const data = await res.json();
+const token=document.querySelector(
+"[name='cf-turnstile-response']"
+)?.value;
 
-	document.getElementById("result").textContent =
-		JSON.stringify(data, null, 2);
 
-	if (window.turnstile) {
-		turnstile.reset();
-	}
+
+if(!username || !title || !message){
+
+alert("入力してください");
+
+status.textContent="Ready";
+
+return;
+
 }
+
+
+if(!token){
+
+alert("Turnstileによる認証を行ってください");
+
+status.textContent="Ready";
+
+return;
+
+}
+
+
+
+const res=await fetch(
+
+"https://green-darkness-a19d.kusogakiller.workers.dev/submit",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+username,
+
+title,
+
+message,
+
+website:
+document.getElementById("website").value,
+
+email_check:
+document.getElementById("email_check").value,
+
+phone_check:
+document.getElementById("phone_check").value,
+
+form_time:
+document.getElementById("form_time").value,
+
+turnstileToken:token
+
+})
+
+}
+
+);
+
+
+
+const data=await res.json();
+
+
+
+document.getElementById("result").textContent=
+
+JSON.stringify(data,null,2);
+
+
+
+status.textContent=
+
+data.success ? "Done" : "Failed";
+
+
+
+if(window.turnstile){
+
+turnstile.reset();
+
+}
+
+
+}
+
+
 </script>
+
 
 </body>
 </html>
