@@ -5,6 +5,19 @@
 	<title>Suggestion Box</title>
 
 	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+	<style>
+		.honeypot {
+			position: absolute;
+			left: -9999px;
+			top: -9999px;
+			width: 0;
+			height: 0;
+			overflow: hidden;
+			opacity: 0;
+			pointer-events: none;
+		}
+	</style>
 </head>
 
 <body>
@@ -14,7 +27,7 @@
 <div>
 	<label>
 		名前:
-		<input id="username" type="text">
+		<input id="username" type="text" maxlength="50">
 	</label>
 </div>
 
@@ -23,7 +36,7 @@
 <div>
 	<label>
 		タイトル:
-		<input id="title" type="text">
+		<input id="title" type="text" maxlength="100">
 	</label>
 </div>
 
@@ -33,13 +46,52 @@
 	<label>
 		内容:
 		<br>
-		<textarea id="message" rows="8" cols="40"></textarea>
+		<textarea id="message" rows="8" cols="40" maxlength="3000"></textarea>
 	</label>
+</div>
+
+<!-- Honeypot -->
+<div class="honeypot">
+	<label>
+		Website:
+		<input
+			id="website"
+			name="website"
+			type="text"
+			autocomplete="off"
+		>
+	</label>
+
+	<label>
+		Email:
+		<input
+			id="email_check"
+			name="email_check"
+			type="email"
+			autocomplete="off"
+		>
+	</label>
+
+	<label>
+		Phone:
+		<input
+			id="phone_check"
+			name="phone_check"
+			type="text"
+			autocomplete="off"
+		>
+	</label>
+
+	<input
+		id="form_time"
+		type="hidden"
+	>
 </div>
 
 <br>
 
-<div class="cf-turnstile"
+<div
+	class="cf-turnstile"
 	data-sitekey="0x4AAAAAAD356TVJG6c5Ipvw">
 </div>
 
@@ -49,17 +101,37 @@
 
 <p id="result"></p>
 
-
 <script>
+const formStart = Date.now();
+
+document.getElementById("form_time").value = formStart;
+
 async function send() {
-	const username = document.getElementById("username").value;
-	const title = document.getElementById("title").value;
-	const message = document.getElementById("message").value;
+
+	const username =
+		document.getElementById("username").value.trim();
+
+	const title =
+		document.getElementById("title").value.trim();
+
+	const message =
+		document.getElementById("message").value.trim();
+
+	const website =
+		document.getElementById("website").value;
+
+	const email_check =
+		document.getElementById("email_check").value;
+
+	const phone_check =
+		document.getElementById("phone_check").value;
+
+	const form_time =
+		document.getElementById("form_time").value;
 
 	const token = document.querySelector(
 		"[name='cf-turnstile-response']"
 	)?.value;
-
 
 	if (!username || !title || !message) {
 		alert("入力してください");
@@ -70,7 +142,6 @@ async function send() {
 		alert("Turnstileによる認証を行ってください");
 		return;
 	}
-
 
 	const res = await fetch(
 		"https://green-darkness-a19d.kusogakiller.workers.dev/submit",
@@ -83,16 +154,25 @@ async function send() {
 				username,
 				title,
 				message,
+
+				website,
+				email_check,
+				phone_check,
+				form_time,
+
 				turnstileToken: token
 			})
 		}
 	);
 
-
 	const data = await res.json();
 
 	document.getElementById("result").textContent =
-		JSON.stringify(data);
+		JSON.stringify(data, null, 2);
+
+	if (window.turnstile) {
+		turnstile.reset();
+	}
 }
 </script>
 
