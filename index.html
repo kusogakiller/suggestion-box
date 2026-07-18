@@ -31,7 +31,7 @@ body{
     margin:0;
     background:var(--bg);
     color:var(--text);
-    font-family:"Inter",sans-serif;
+    font-family:"Inter",Arial,sans-serif;
 }
 
 
@@ -43,41 +43,56 @@ body{
 
 
 h1{
-    margin:0 0 10px;
-    font-size:40px;
+    margin:0 0 8px;
+    font-size:42px;
+    letter-spacing:-0.03em;
 }
 
 
 .subtitle{
     color:var(--muted);
     line-height:1.8;
-    margin-bottom:30px;
+    margin-bottom:32px;
 }
 
 
 .section-title{
     font-size:12px;
     color:var(--muted);
-    letter-spacing:.08em;
+    letter-spacing:.1em;
     text-transform:uppercase;
-    margin:22px 0 10px;
+    margin:24px 0 10px;
 }
+
 
 
 .card{
 
-    background:white;
+    background:var(--card);
 
     border:1px solid var(--border);
 
-    border-radius:12px;
+    border-radius:14px;
 
     padding:20px;
 
     box-shadow:
-        0 6px 20px rgba(0,0,0,.04);
+    0 6px 20px rgba(0,0,0,.04);
 
 }
+
+
+
+label{
+
+    display:block;
+
+    font-size:14px;
+
+    color:#374151;
+
+}
+
 
 
 input,
@@ -85,37 +100,59 @@ textarea{
 
     width:100%;
 
-    padding:10px 12px;
+    margin-top:8px;
 
-    margin-top:6px;
+    padding:12px 14px;
 
     font-size:14px;
 
-    border-radius:8px;
+    border-radius:10px;
 
     border:1px solid var(--border);
 
+    background:#fff;
+
     font-family:inherit;
 
+    transition:.15s;
+
 }
+
+
+
+input:focus,
+textarea:focus{
+
+    outline:none;
+
+    border-color:#9ca3af;
+
+    box-shadow:
+    0 0 0 3px rgba(17,24,39,.08);
+
+}
+
 
 
 textarea{
 
     resize:vertical;
 
+    min-height:160px;
+
 }
+
 
 
 button{
 
-    padding:10px 16px;
+    padding:11px 18px;
 
     font-size:14px;
 
-    border-radius:8px;
+    border-radius:10px;
 
-    border:1px solid var(--border);
+    border:1px solid #111827;
 
     background:#111827;
 
@@ -128,11 +165,21 @@ button{
 }
 
 
+
 button:hover{
 
     transform:translateY(-1px);
 
 }
+
+
+
+button:active{
+
+    transform:none;
+
+}
+
 
 
 .status{
@@ -146,30 +193,29 @@ button:hover{
 }
 
 
+
 .output{
 
-    margin-top:20px;
+    margin-top:0;
 
-    padding:14px;
+    padding:18px;
 
-    background:#f9fafb;
+    background:white;
 
     border:1px solid var(--border);
 
-    border-radius:8px;
+    border-radius:14px;
+
+    min-height:80px;
 
     font-family:"JetBrains Mono",monospace;
 
     white-space:pre-wrap;
 
-}
-
-
-small{
-
-    color:var(--muted);
+    overflow:auto;
 
 }
+
 
 
 .honeypot{
@@ -178,24 +224,13 @@ small{
 
     left:-9999px;
 
-    top:-9999px;
-
-    width:0;
-
-    height:0;
-
-    overflow:hidden;
-
-    opacity:0;
-
-    pointer-events:none;
-
 }
+
 
 
 footer{
 
-    margin-top:28px;
+    margin-top:30px;
 
     color:var(--muted);
 
@@ -215,7 +250,7 @@ footer{
 <div class="container">
 
 
-<h1>Suggestion Box</h1>
+<h1>目安箱</h1>
 
 
 <div class="subtitle">
@@ -366,132 +401,234 @@ Created by @ねぎら◆BBBBBBBBB.
 
 <script>
 
+const API =
+"https://green-darkness-a19d.kusogakiller.workers.dev/submit";
+
 
 const formStart = Date.now();
 
-document.getElementById("form_time").value=formStart;
+document.getElementById("form_time").value = formStart;
+
+
+let sending = false;
 
 
 
 async function send(){
 
-
-const status=document.getElementById("status");
-
-status.textContent="Sending...";
-
-
-const username=
-document.getElementById("username").value.trim();
+    if(sending){
+        return;
+    }
 
 
-const title=
-document.getElementById("title").value.trim();
+    const status =
+        document.getElementById("status");
 
 
-const message=
-document.getElementById("message").value.trim();
+    const result =
+        document.getElementById("result");
 
 
-
-const token=document.querySelector(
-"[name='cf-turnstile-response']"
-)?.value;
+    const button =
+        document.querySelector("button");
 
 
 
-if(!username || !title || !message){
+    const username =
+        document.getElementById("username")
+        .value
+        .trim();
 
-alert("内容を入力してください");
 
-status.textContent="Ready";
+    const title =
+        document.getElementById("title")
+        .value
+        .trim();
 
-return;
+
+    const message =
+        document.getElementById("message")
+        .value
+        .trim();
+
+
+
+    const token =
+        document.querySelector(
+            "[name='cf-turnstile-response']"
+        )?.value;
+
+
+
+    if(!username || !title || !message){
+
+        alert("内容を入力してください");
+
+        status.textContent = "Ready";
+
+        return;
+
+    }
+
+
+
+    if(!token){
+
+        alert("Turnstileによる認証を行ってください");
+
+        status.textContent = "Ready";
+
+        return;
+
+    }
+
+
+
+    sending = true;
+
+
+    if(button){
+
+        button.disabled = true;
+
+    }
+
+
+    status.textContent = "Sending...";
+
+
+
+    try{
+
+
+        const response =
+            await fetch(
+                API,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        username,
+
+                        title,
+
+                        message,
+
+
+                        website:
+                        document.getElementById("website")
+                        .value,
+
+
+                        email_check:
+                        document.getElementById("email_check")
+                        .value,
+
+
+                        phone_check:
+                        document.getElementById("phone_check")
+                        .value,
+
+
+                        form_time:
+                        document.getElementById("form_time")
+                        .value,
+
+
+                        turnstileToken:
+                        token
+
+                    })
+                }
+            );
+
+
+
+        let data;
+
+
+
+        try{
+
+            data =
+                await response.json();
+
+        }catch{
+
+            data = {
+                success:false,
+                error:"Invalid server response"
+            };
+
+        }
+
+
+
+        result.textContent =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+
+
+
+        status.textContent =
+            data.success
+            ?
+            "Done"
+            :
+            "Failed";
+
+
+
+        if(window.turnstile){
+
+            turnstile.reset();
+
+        }
+
+
+
+    }catch(error){
+
+
+        result.textContent =
+            JSON.stringify(
+                {
+                    success:false,
+                    error:String(error)
+                },
+                null,
+                2
+            );
+
+
+        status.textContent =
+            "Error";
+
+
+
+    }finally{
+
+
+        sending = false;
+
+
+        if(button){
+
+            button.disabled = false;
+
+        }
+
+    }
 
 }
-
-
-if(!token){
-
-alert("Turnstileによる認証を行ってください");
-
-status.textContent="Ready";
-
-return;
-
-}
-
-
-
-const res=await fetch(
-
-"https://green-darkness-a19d.kusogakiller.workers.dev/submit",
-
-{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify({
-
-username,
-
-title,
-
-message,
-
-website:
-document.getElementById("website").value,
-
-email_check:
-document.getElementById("email_check").value,
-
-phone_check:
-document.getElementById("phone_check").value,
-
-form_time:
-document.getElementById("form_time").value,
-
-turnstileToken:token
-
-})
-
-}
-
-);
-
-
-
-const data=await res.json();
-
-
-
-document.getElementById("result").textContent=
-
-JSON.stringify(data,null,2);
-
-
-
-status.textContent=
-
-data.success ? "Done" : "Failed";
-
-
-
-if(window.turnstile){
-
-turnstile.reset();
-
-}
-
-
-}
-
 
 </script>
 
