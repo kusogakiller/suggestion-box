@@ -5,13 +5,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Suggestion Box</title>
+<meta http-equiv="Content-Security-Policy"
+content="
+default-src 'self';
+script-src 'self' https://challenges.cloudflare.com;
+style-src 'self' https://fonts.googleapis.com;
+font-src https://fonts.gstatic.com;
+connect-src https://green-darkness-a19d.kusogakiller.workers.dev;
+frame-src https://challenges.cloudflare.com;
+">
+
+<title>目安箱</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 
 <style>
 
@@ -31,9 +43,8 @@ body{
     margin:0;
     background:var(--bg);
     color:var(--text);
-    font-family:"Inter",sans-serif;
+    font-family:Arial,sans-serif;
 }
-
 
 .container{
     max-width:820px;
@@ -55,27 +66,24 @@ h1{
 }
 
 
-.section-title{
-    font-size:12px;
-    color:var(--muted);
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    margin:22px 0 10px;
-}
-
-
 .card{
 
     background:white;
-
     border:1px solid var(--border);
-
     border-radius:12px;
-
     padding:20px;
 
     box-shadow:
-        0 6px 20px rgba(0,0,0,.04);
+    0 6px 20px rgba(0,0,0,.04);
+}
+
+
+.section-title{
+
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.08em;
+    margin:22px 0 10px;
 
 }
 
@@ -84,7 +92,6 @@ input,
 textarea{
 
     width:100%;
-
     padding:10px 12px;
 
     margin-top:6px;
@@ -94,8 +101,6 @@ textarea{
     border-radius:8px;
 
     border:1px solid var(--border);
-
-    font-family:inherit;
 
 }
 
@@ -111,8 +116,6 @@ button{
 
     padding:10px 16px;
 
-    font-size:14px;
-
     border-radius:8px;
 
     border:1px solid var(--border);
@@ -123,14 +126,14 @@ button{
 
     cursor:pointer;
 
-    transition:.15s;
-
 }
 
 
-button:hover{
+button:disabled{
 
-    transform:translateY(-1px);
+    opacity:.6;
+
+    cursor:not-allowed;
 
 }
 
@@ -140,8 +143,6 @@ button:hover{
     margin-left:12px;
 
     color:var(--muted);
-
-    font-size:13px;
 
 }
 
@@ -165,12 +166,6 @@ button:hover{
 }
 
 
-small{
-
-    color:var(--muted);
-
-}
-
 
 .honeypot{
 
@@ -178,17 +173,11 @@ small{
 
     left:-9999px;
 
-    top:-9999px;
+    width:1px;
 
-    width:0;
-
-    height:0;
+    height:1px;
 
     overflow:hidden;
-
-    opacity:0;
-
-    pointer-events:none;
 
 }
 
@@ -215,7 +204,9 @@ footer{
 <div class="container">
 
 
-<h1>Suggestion Box</h1>
+<h1>
+Suggestion Box
+</h1>
 
 
 <div class="subtitle">
@@ -227,27 +218,25 @@ footer{
 </div>
 
 
-
 <div class="section-title">
-
 Message
-
 </div>
+
+
+<form id="form">
 
 
 <div class="card">
 
 
 <label>
-
 名前
 
 <input
 id="username"
-type="text"
 maxlength="16"
-placeholder="Username">
-
+autocomplete="username"
+required>
 </label>
 
 
@@ -255,15 +244,12 @@ placeholder="Username">
 
 
 <label>
-
 タイトル
 
 <input
 id="title"
-type="text"
 maxlength="100"
-placeholder="Title">
-
+required>
 </label>
 
 
@@ -271,14 +257,13 @@ placeholder="Title">
 
 
 <label>
-
 内容
 
 <textarea
 id="message"
 rows="8"
 maxlength="1000"
-placeholder="Message"></textarea>
+required></textarea>
 
 </label>
 
@@ -287,26 +272,32 @@ placeholder="Message"></textarea>
 
 
 
-<!-- Honeypot -->
-
 <div class="honeypot">
 
-<input id="website">
 
-<input id="email_check">
+<input id="website"
+autocomplete="off">
 
-<input id="phone_check">
+
+<input id="email_check"
+autocomplete="off">
+
+
+<input id="phone_check"
+autocomplete="off">
+
 
 <input id="form_time">
+
 
 </div>
 
 
+<br>
+
 
 <div class="section-title">
-
 Verification
-
 </div>
 
 
@@ -322,35 +313,30 @@ data-sitekey="0x4AAAAAAD356TVJG6c5Ipvw">
 <br>
 
 
-<button onclick="send()">
-
+<button id="submit">
 Send
-
 </button>
 
 
 <span id="status" class="status">
-
 Ready
-
 </span>
 
 
 </div>
 
 
+</form>
+
+
 
 <div class="section-title">
-
 Result
-
 </div>
 
 
 <div class="output" id="result">
-
 No output yet.
-
 </div>
 
 
@@ -358,8 +344,10 @@ No output yet.
 <footer>
 
 Secure suggestion system powered by Cloudflare Workers.
+Created by @ねぎら◆BBBBBBBBB.
 
 </footer>
+
 
 
 </div>
@@ -369,83 +357,82 @@ Secure suggestion system powered by Cloudflare Workers.
 <script>
 
 
-const formStart = Date.now();
-
-document.getElementById("form_time").value=formStart;
-
+const API =
+"https://green-darkness-a19d.kusogakiller.workers.dev/submit";
 
 
-async function send(){
+const form =
+document.getElementById("form");
 
 
-const status=document.getElementById("status");
+const button =
+document.getElementById("submit");
+
+
+const status =
+document.getElementById("status");
+
+
+const result =
+document.getElementById("result");
+
+
+const formTime =
+document.getElementById("form_time");
+
+
+formTime.value =
+Date.now();
+
+
+
+form.addEventListener(
+"submit",
+async(e)=>{
+
+
+e.preventDefault();
+
+
+
+if(button.disabled)
+return;
+
+
+
+button.disabled=true;
 
 status.textContent="Sending...";
 
 
-const username=
-document.getElementById("username").value.trim();
+
+try{
 
 
-const title=
-document.getElementById("title").value.trim();
-
-
-const message=
-document.getElementById("message").value.trim();
-
-
-
-const token=document.querySelector(
+const token =
+document.querySelector(
 "[name='cf-turnstile-response']"
 )?.value;
 
 
 
-if(!username || !title || !message){
-
-alert("内容を入力してください");
-
-status.textContent="Ready";
-
-return;
-
-}
-
-
-if(!token){
-
-alert("Turnstileによる認証を行ってください");
-
-status.textContent="Ready";
-
-return;
-
-}
+if(!token)
+throw new Error(
+"Turnstile required"
+);
 
 
 
-const res=await fetch(
+const body={
 
-"https://green-darkness-a19d.kusogakiller.workers.dev/submit",
+username:
+document.getElementById("username").value.trim(),
 
-{
+title:
+document.getElementById("title").value.trim(),
 
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify({
-
-username,
-
-title,
-
-message,
+message:
+document.getElementById("message").value.trim(),
 
 website:
 document.getElementById("website").value,
@@ -457,31 +444,67 @@ phone_check:
 document.getElementById("phone_check").value,
 
 form_time:
-document.getElementById("form_time").value,
+formTime.value,
 
-turnstileToken:token
+turnstileToken:
+token
 
-})
+};
+
+
+
+const response =
+await fetch(
+API,
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:
+JSON.stringify(body)
 
 }
-
 );
 
 
 
-const data=await res.json();
+let data;
+
+
+try{
+
+data =
+await response.json();
+
+}catch{
+
+data={
+error:
+"Invalid server response"
+};
+
+}
 
 
 
-document.getElementById("result").textContent=
+result.textContent =
+JSON.stringify(
+data,
+null,
+2
+);
 
-JSON.stringify(data,null,2);
 
 
-
-status.textContent=
-
-data.success ? "Done" : "Failed";
+status.textContent =
+data.success
+?
+"Done"
+:
+"Failed";
 
 
 
@@ -492,7 +515,28 @@ turnstile.reset();
 }
 
 
+}catch(error){
+
+
+result.textContent =
+String(error);
+
+
+status.textContent =
+"Error";
+
+
+
+}finally{
+
+
+button.disabled=false;
+
+
 }
+
+
+});
 
 
 </script>
